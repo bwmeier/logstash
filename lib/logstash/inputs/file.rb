@@ -4,6 +4,8 @@ require "logstash/namespace"
 require "pathname"
 require "socket" # for Socket.gethostname
 
+require "rbconfig"
+
 # Stream events from files.
 #
 # By default, each event is assumed to be one line. If you
@@ -114,25 +116,64 @@ class LogStash::Inputs::File < LogStash::Inputs::Base
 
   public
   def run(queue)
-    @tail = FileWatch::Tail.new(@tail_config)
-    @tail.logger = @logger
-    @path.each { |path| @tail.tail(path) }
+    is_windows = (RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/)
     hostname = Socket.gethostname
 
-    @tail.subscribe do |path, line|
-      #source = Addressable::URI.new(:scheme => "file", :host => hostname, :path => path).to_s
-      source = "file://#{hostname}/#{path.gsub("\\","/")}"
-      @logger.debug? && @logger.debug("Received line", :path => path, :line => line)
-      e = to_event(line, source)
-      if e
-        queue << e
+    if is_windows
+      @format = "json"
+      @message_format = "%{@message}"
+      command = nil
+      @path.each do |path| 
+        ind = path.rindex('\\')
+        if ind != nil
+          glob = path[ind+1, path.length]
+          dir = path[0, ind]
+          command = "tailer.exe -d \"#{dir}\" -g \"#{glob}\" -t \"#{@tail_config[:sincedb_path]}\" -m #{$$}"
+        end
       end
+      @logger.info("Windows helper command: #{command}")
+      @pipe = IO.popen(command, mode="r")
+
+      @pipe.each do |line|
+        line = line.chomp
+        @logger.debug? && @logger.debug("Received line", :command => command, :line => line)
+        e = to_event(line, "unknown")
+        if e
+          if !(e.source =~ /^file/)
+            e.source_host = hostname
+            e.source_path = e.source
+            e.source = "file://#{hostname}/#{e.source}"
+          end
+          queue << e
+        end
+      end
+    else
+      @logger.info("Running non-windows code");
+      @tail = FileWatch::Tail.new(@tail_config)
+      @tail.logger = @logger
+      @path.each { |path| @tail.tail(path) }
+
+      @tail.subscribe do |path, line|
+        #source = Addressable::URI.new(:scheme => "file", :host => hostname, :path => path).to_s
+        source = "file://#{hostname}/#{path.gsub("\\","/")}"
+        @logger.debug? && @logger.debug("Received line", :path => path, :line => line)
+        e = to_event(line, source)
+        if e
+          queue << e
+        end
+      end
+      finished
     end
-    finished
+    
   end # def run
 
   public
   def teardown
-    @tail.quit
+    if @tail != nil
+      @tail.quit
+    end
+    if @pipe != nil
+      @pipe.close
+    end
   end # def teardown
 end # class LogStash::Inputs::File
