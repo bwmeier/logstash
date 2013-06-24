@@ -142,7 +142,7 @@ module FileWatch
 
         stat = File::Stat.new(file)
 	  if stat.ino == 0
-	    inode = [Digest::SHA256.base64digest(path), stat.dev_major, stat.dev_minor]
+	    inode = [Digest::SHA256.base64digest(file), stat.dev_major, stat.dev_minor]
 	  else
         inode = [stat.ino.to_s, stat.dev_major, stat.dev_minor]
 	  end
