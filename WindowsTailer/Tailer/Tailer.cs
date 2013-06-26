@@ -54,7 +54,7 @@ namespace Pros.Tailer
                 myself.Initialize();
                 myself.Run();
             }
-            Console.ReadKey();
+            if (Debugger.IsAttached) Console.ReadKey();
         }
 
         public Tailer(string[] args)
