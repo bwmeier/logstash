@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TailerTest", "TailerTest\TailerTest.csproj", "{4F012291-5E3C-408E-9584-2C363597BFE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tailer", "Tailer\Tailer.csproj", "{A6501EB1-F679-4491-8A7C-1D1D69F13C50}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F012291-5E3C-408E-9584-2C363597BFE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F012291-5E3C-408E-9584-2C363597BFE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F012291-5E3C-408E-9584-2C363597BFE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F012291-5E3C-408E-9584-2C363597BFE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6501EB1-F679-4491-8A7C-1D1D69F13C50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6501EB1-F679-4491-8A7C-1D1D69F13C50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6501EB1-F679-4491-8A7C-1D1D69F13C50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6501EB1-F679-4491-8A7C-1D1D69F13C50}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
