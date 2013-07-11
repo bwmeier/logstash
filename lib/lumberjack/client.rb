@@ -122,18 +122,24 @@ module Lumberjack
       pack << "N"
       keys.each do |k|
         val = deep_get(hash,k)
-        key_length = k.length
-        val_length = val.length
-        frame << key_length
-        pack << "N"
-        frame << k
-        pack << "A#{key_length}"
-        frame << val_length
-        pack << "N"
-        frame << val
-        pack << "A#{val_length}"
+        packKV(k, val, pack, frame) if val.class != Array
+        val.each {|v| packKV(k, v, pack, frame)} if val.class == Array
       end
       frame.pack(pack)
+    end
+
+    private
+    def packKV(k, val, pack, frame)
+      key_length = k.length
+      val_length = val.length
+      frame << key_length
+      pack << "N"
+      frame << k
+      pack << "A#{key_length}"
+      frame << val_length
+      pack << "N"
+      frame << val
+      pack << "A#{val_length}"
     end
 
     private
@@ -149,7 +155,7 @@ module Lumberjack
     def deep_keys(hash, prefix="")
       keys = []
       hash.each do |k,v|
-        keys << "#{prefix}#{k}" if v.class == String
+        keys << "#{prefix}#{k}" if (v.class == String || v.class == Array)
         keys << deep_keys(hash[k], "#{k}.") if v.class == Hash
       end
       keys.flatten
