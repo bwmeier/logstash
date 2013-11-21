@@ -62,6 +62,9 @@ class File
         end
         dir = expand_path_JRUBY_6970(path, dir)
         return fix_jar_path(jar, dir)
+      elsif path.include?("/../../")
+        path = path.gsub "/\.\./\.\.\/", "/../"
+        return expand_path_JRUBY_6970(path, dir)
       else
         return expand_path_JRUBY_6970(path, dir)
       end
