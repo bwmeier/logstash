@@ -44,9 +44,15 @@ class LogStash::Inputs::Lumberjack < LogStash::Inputs::Base
   public
   def run(output_queue)
     @lumberjack.run do |l|
-      @codec.decode(l.delete("line")) do |event|
+      if (!l.has_key?("message") && l.has_key?("line"))
+        @codec.decode(l.delete("line")) do |event|
+          decorate(event)
+          l.each { |k,v| event[k] = v; v.force_encoding(Encoding::UTF_8) }
+          output_queue << event
+        end
+      else
+        event = LogStash::Event.new(l)
         decorate(event)
-        l.each { |k,v| event[k] = v; v.force_encoding(Encoding::UTF_8) }
         output_queue << event
       end
     end
